@@ -1,0 +1,106 @@
+html, body {
+    font-family: 'Roboto', 'Helvetica', sans-serif;
+}
+.nodrag {
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.mdl-data-table {
+    color: #000000;
+}
+.md-content {
+    background-color: #EEEEEE;
+}
+.nav-selected {
+    background-color: #FF0000 !important;
+    background: #FF0000 !important;
+}
+#btn-signin:hover {
+    cursor: pointer;
+}
+#btn-signout {
+    display: none;
+}
+.img-signin {
+    width: 160px;
+}
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    margin-bottom: 8px;
+}
+.demo-layout .mdl-layout__header .mdl-layout__drawer-button {
+    color: rgba(0, 0, 0, 0.54);
+}
+.drawer { border: none; }
+/* iOS Safari specific workaround */
+.drawer .mdl-menu__container {
+    z-index: -1;
+}
+.drawer .navigation {
+    z-index: -2;
+}
+/* END iOS Safari specific workaround */
+.ic-nav {
+    width: 48px;
+    margin-right: 16px;
+}
+#userName {
+    font-weight: 800;
+}
+.user-details {
+    margin-bottom: 8px;
+}
+.drawer .mdl-menu .mdl-menu__item {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+         -ms-flex-align: center;
+            align-items: center;
+}
+.drawer-header {
+    box-sizing: border-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-justify-content: flex-end;
+              -ms-flex-pack: end;
+            justify-content: flex-end;
+    padding: 16px 32px;
+    height: 200px;
+}
+
+.navigation {
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+            flex-grow: 1;
+}
+.demo-layout .navigation .mdl-navigation__link {
+    display: -webkit-flex !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
+    -webkit-flex-direction: row;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -webkit-align-items: center;
+         -ms-flex-align: center;
+            align-items: center;
+    color: #FAFAFA !important;
+    font-weight: 500;
+}
+.demo-layout .navigation .mdl-navigation__link:hover {
+    background-color: #0D47A1 !important;
+    cursor: pointer;
+}
+.demo-layout .navigation .active {
+    background-color: #FFB74D !important;
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AQUA Apps | Suggest</title>
+
+        <!-- Meta -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="AQUA Apps Suggestions">
+        <meta name="author" content="AQUA Apps">
+        <meta name="robots" content="noindex">
+        <link rel="shortcut icon" href="favicon.ico">
+
+        <!-- Social -->
+        <meta property="og:image" content="http://aquaapps.co/res/social/preview-facebook.png" />
+
+        <!-- Fonts -->
+        <link href='https://fonts.googleapis.com/css?family=Raleway:300,400,600,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic' rel='stylesheet' type='text/css'>
+
+        <!-- Themes -->
+        <link rel="stylesheet" href="styles/styles.css">
+
+        <!-- Angular Material -->
+        <link rel="stylesheet" href="src/libs/angular-material.min.css">
+
+        <!-- Material Design Light -->
+        <link rel="stylesheet" href="src/libs/material-icons.css">
+        <link rel="stylesheet" href="src/libs/material.indigo-pink.min.css">
+    </head>
+
+    <body ng-app="AQUA Apps" ng-cloak ng-controller="SiteCtrl">
+        <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+            <header class="suggest-header mdl-layout__header mdl-color--blue-600 mdl-color-text--grey-50">
+                <div class="mdl-layout__header-row">
+                    <span class="mdl-layout-title">AQUA Apps - Suggest</span>
+                    <div class="mdl-layout-spacer"></div>
+                </div>
+            </header>
+            <div class="nodrag drawer mdl-layout__drawer mdl-color--blue-900 mdl-color-text--blue-50">
+                <header class="drawer-header">
+                    <img id="userDp" class="user-avatar" src="images/ic-dp.png"/>
+                    <div class="user-details">
+                        <span id="userName">Not Signed In</span>
+                        <span id="userEmail">support@aquaapps.co</span>
+                    </div>
+                    <a id="btn-signin" class="btn-signin" onclick="signin()"><img class="nodrag img-signin" src="images/btn_google.png"/></a>
+                    <a id="btn-signout" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color--blue-600 mdl-color-text--blue-grey-50" onclick="signout()">Sign Out</a>
+                </header>
+                <nav class="navigation mdl-navigation mdl-color--blue-700">
+                    <a class="mdl-navigation__link active" onclick="setApp(this, 'co_aquaapps_huddle')"><img class="nodrag ic-nav" src="images/vector/ic-huddle.svg" />HUDdle</a>
+                    <a class="mdl-navigation__link" onclick="setApp(this, 'co_aquaapps_convert')"><img class="nodrag ic-nav" src="images/vector/ic-convert.svg" />Convert</a>
+                    <a class="mdl-navigation__link" onclick="setApp(this, 'com_mra_one_free')"><img class="nodrag ic-nav" src="images/vector/ic-latin.svg" />Learn Basic Latin</a>
+                    <a class="mdl-navigation__link" onclick="setApp(this, 'com_aqualabs_isquash')"><img class="nodrag ic-nav" src="images/vector/ic-squash.svg" />Squash</a>
+                    <a class="mdl-navigation__link" onclick="setApp(this, 'com_aqualabs_triplanner')"><img class="nodrag ic-nav" src="images/vector/ic-triplanner.svg" />Triplanner</a>
+                </nav>
+            </div>
+            <main class="mdl-layout__content mdl-color--grey-100">
+                <table class="nodrag mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">
+                                <button id="btnNewSuggestion" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" onclick="newSuggestion()">
+                                    <i class="material-icons">add</i>
+                                </button>
+                            </th>
+                            <th style="width: 10%;" class="mdl-data-table__cell--non-numeric">Votes</th>
+                            <th style="width: 65%;" class="mdl-data-table__cell--non-numeric">Suggestion</th>
+                            <th style="width: 15%;" class="mdl-data-table__cell--non-numeric">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-suggestions">
+                    </tbody>
+                </table>
+            </main>
+        </div>
+
+        <!-- Firebase -->
+        <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+        <script>
+            var config = {
+                apiKey: "AIzaSyDAd3bUUf2RvMybPfBTxspBno0whvoywbs",
+                authDomain: "feedback-b58bb.firebaseapp.com",
+                databaseURL: "https://feedback-b58bb.firebaseio.com",
+                storageBucket: "feedback-b58bb.appspot.com",
+                messagingSenderId: "776226623289"
+            };
+            firebase.initializeApp(config);
+        </script>
+
+        <!-- Angular -->
+        <script src="src/libs/angularjs-1.5.3-angular.min.js"></script>
+        <script src="src/libs/angularjs-1.5.3-angular-animate.min.js"></script>
+        <script src="src/libs/angularjs-1.5.3-angular-aria.min.js"></script>
+        <script src="src/libs/angularjs-1.5.3-angular-messages.min.js"></script>
+        <script src="src/libs/angular-sanitize-1.4.12.js"></script>
+        <script src="src/libs/angularmaterial-1.1.0-rc2-angular-material.min.js"></script>
+
+        <!-- Libraries -->
+        <script src="src/libs/moment.min.js"></script>
+        <script src="src/libs/material.min.js"></script>
+
+        <!-- Javascript -->
+        <script src="src/main.js"></script>
+    </body>
+</html>
