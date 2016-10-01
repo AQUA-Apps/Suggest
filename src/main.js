@@ -51,7 +51,7 @@ function checkRedirect() {
     firebase.auth().getRedirectResult().then(function(result) {
         if (result.user) signedInWith(result.user);
         else getSuggestions();
-    }).catch(function(error) { globalScope.showToast("Oops something went wrong"); });
+    }).catch(function(error) { getSuggestions() });
 }
 
 function signedInWith(user) {
@@ -70,7 +70,7 @@ function signedInWith(user) {
 function signout() {
     firebase.auth().signOut().then(function() {
         curUser = null;
-        userVotes = [];
+        userVotes = {};
 
         document.getElementById("btn-signout").style.display = "none";
         document.getElementById("btn-signin").style.display = "block";
@@ -82,66 +82,85 @@ function signout() {
 
 checkUser();
 
-var allSuggestions = [], suggestionPos = [], selectedApp = "co_aquaapps_huddle", suggestionsRef;
+var allSuggestions = {}, suggestionPos = {}, selectedApp = "co_aquaapps_huddle", suggestionsRef, approvedSuggestionsRef, table, pos;
 function getSuggestions() {
-    var pos = 0;
-    var table = document.getElementById("table-suggestions");
+    pos = 0;
+    table = document.getElementById("table-suggestions");
     table.innerHTML = "";
 
-    allSuggestions = [], suggestionPos = [];
+    allSuggestions = {}, suggestionPos = {};
     if (suggestionsRef) {
         suggestionsRef.off("child_added");
         suggestionsRef.off("child_changed");
         suggestionsRef.off("child_removed");
     }
+    if (approvedSuggestionsRef) {
+        approvedSuggestionsRef.off("child_added");
+        approvedSuggestionsRef.off("child_changed");
+        approvedSuggestionsRef.off("child_removed");
+    }
+
     suggestionsRef = firebase.database().ref("suggestions/" + selectedApp).orderByChild("voteCount").limitToFirst(200);
-    suggestionsRef.on("child_added", function(data) {
-        var suggestion = data.val();
-        allSuggestions[data.key] = data.val();
-        suggestionPos[data.key] = pos;
+    approvedSuggestionsRef = firebase.database().ref("approved_suggestions/" + selectedApp).orderByChild("voteCount").limitToFirst(200);
+    suggestionsRef.on("child_added", onSuggestionAdded);
+    approvedSuggestionsRef.on("child_added", onSuggestionAdded);
 
-        var userVoted = false;
-        if (firebase.auth().currentUser) userVoted = userVotes[data.key];
+    suggestionsRef.on("child_changed", onSuggestionChanged);
+    approvedSuggestionsRef.on("child_changed", onSuggestionChanged);
 
-        var row = table.insertRow(pos++);
-        var cellVoteButton = row.insertCell(0), cellVotes = row.insertCell(1), cellSuggestion = row.insertCell(2), cellCreated = row.insertCell(3), voteButton = document.createElement("button"), voteIcon = document.createElement("i");
-        voteButton.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
-        voteIcon.className = "material-icons";
-        voteIcon.innerHTML = "keyboard_arrow_up";
-        if (userVoted) voteIcon.style.color = "#8BC34A";
-        voteButton.appendChild(voteIcon);
-        cellVoteButton.appendChild(voteButton);
-        voteButton.onclick = function() {
-            if (firebase.auth().currentUser) {
-                vote(data.key);
-                voteIcon.style.color = userVoted ? "#000000" : "#8BC34A";
-                cellVotes.innerHTML = -allSuggestions[data.key].voteCount;
-                userVoted = !userVoted;
-            } else globalScope.showUserError();
-        };
+    suggestionsRef.on("child_removed", onSuggestionRemoved);
+    approvedSuggestionsRef.on("child_removed", onSuggestionRemoved);
+}
 
-        cellVotes.id = "cell-votes-" + (pos - 1);
-        cellVotes.innerHTML = -suggestion.voteCount;
-        cellSuggestion.innerHTML = suggestion.suggestion;
-        cellCreated.innerHTML = suggestion.created;
+function onSuggestionAdded(data) {
+    var suggestion = data.val();
+    allSuggestions[data.key] = data.val();
+    suggestionPos[data.key] = pos;
 
-        cellVotes.className = cellSuggestion.className = cellCreated.className = "mdl-data-table__cell--non-numeric";
-    });
+    var userVoted = false;
+    if (firebase.auth().currentUser) userVoted = userVotes[data.key];
 
-    suggestionsRef.on("child_changed", function(data) {
-        allSuggestions[data.key] = data.val();
-        document.getElementById("cell-votes-" + suggestionPos[data.key]).innerHTML = -data.val().voteCount;
-    });
+    var row = table.insertRow(pos++);
+    var cellVoteButton = row.insertCell(0), cellVotes = row.insertCell(1), cellSuggestion = row.insertCell(2), cellCreated = row.insertCell(3), voteButton = document.createElement("button"), voteIcon = document.createElement("i");
+    voteButton.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
+    voteIcon.className = "material-icons";
+    voteIcon.innerHTML = "keyboard_arrow_up";
+    if (userVoted) voteIcon.style.color = "#8BC34A";
+    voteButton.appendChild(voteIcon);
+    cellVoteButton.appendChild(voteButton);
+    voteButton.onclick = function() {
+        if (firebase.auth().currentUser) {
+            vote(data.key);
+            voteIcon.style.color = userVoted ? "#000000" : "#8BC34A";
+            userVoted = !userVoted;
+        } else globalScope.showUserError();
+    };
 
-    suggestionsRef.on("child_removed", function(data) {
-        var rowPos = suggestionPos[data.key];
-        table.deleteRow(rowPos);
-        for (key in suggestionPos)
-            if (suggestionPos[key] > rowPos)
-                suggestionPos[key] -= 1;
-        delete suggestionPos[data.key];
-        pos--;
-    });
+    cellVotes.id = "cell-votes-" + (pos - 1);
+    cellSuggestion.id = "cell-suggestion-" + (pos - 1);
+    cellCreated.id = "cell-created-" + (pos - 1);
+    cellVotes.innerHTML = -suggestion.voteCount - 1;
+    cellSuggestion.innerHTML = suggestion.suggestion;
+    cellCreated.innerHTML = suggestion.created;
+
+    cellVotes.className = cellSuggestion.className = cellCreated.className = "mdl-data-table__cell--non-numeric";
+}
+
+function onSuggestionChanged(data) {
+    allSuggestions[data.key] = data.val();
+    document.getElementById("cell-votes-" + suggestionPos[data.key]).innerHTML = -data.val().voteCount - 1;
+    document.getElementById("cell-suggestion-" + suggestionPos[data.key]).innerHTML = data.val().suggestion;
+    document.getElementById("cell-created-" + suggestionPos[data.key]).innerHTML = data.val().created;
+}
+
+function onSuggestionRemoved(data) {
+    var rowPos = suggestionPos[data.key];
+    table.deleteRow(rowPos);
+    for (key in suggestionPos)
+        if (suggestionPos[key] > rowPos)
+            suggestionPos[key] -= 1;
+    delete suggestionPos[data.key];
+    pos--;
 }
 
 function newSuggestion() {
@@ -150,25 +169,32 @@ function newSuggestion() {
 }
 
 function addSuggestion(suggestionText) {
-    var suggestion = { created: moment().format("DD MMM YYYY"), voteCount: -1, suggestion: suggestionText }, updates = {};
+    var suggestion = { created: moment().format("DD MMM YYYY"), voteCount: -1, suggestion: suggestionText }, updates = {}, approvedUpdates = {};
     var newSuggestionKey = firebase.database().ref().child('suggestions/' + selectedApp).push().key;
     updates["/suggestions/" + selectedApp + "/" + newSuggestionKey] = suggestion;
+    approvedUpdates["/approved_suggestions/" + selectedApp + "/" + newSuggestionKey] = suggestion;
     updates["/users/" + firebase.auth().currentUser.uid + "/" + selectedApp + "/" + newSuggestionKey] = true;
     userVotes[newSuggestionKey] = true;
     firebase.database().ref().update(updates);
+    firebase.database().ref().update(approvedUpdates);
+    globalScope.showToast("Thank you. Your suggestion will be available for voting once approved");
 }
 
 function vote(key) {
-    var userVoted = userVotes[key], updates = {};
-    updates["/suggestions/" + selectedApp + "/" + key + "/voteCount"] = allSuggestions[key].voteCount + (userVoted ? 1 : -1);
+    var userVoted = userVotes[key], updates = {}, approvedUpdates = {};
+    allSuggestions[key].voteCount += (userVoted ? 1 : -1);
+    updates["/suggestions/" + selectedApp + "/" + key + "/voteCount"] = allSuggestions[key].voteCount;
+    updates["/approved_suggestions/" + selectedApp + "/" + key + "/voteCount"] = allSuggestions[key].voteCount;
+    approvedUpdates["/approved_suggestions/" + selectedApp + "/" + key] = allSuggestions[key];
     updates["/users/" + firebase.auth().currentUser.uid + "/" + selectedApp + "/" + key] = !userVoted;
     firebase.database().ref().update(updates);
+    firebase.database().ref().update(approvedUpdates);
 }
 
 function getUserVotes() {
     var user = firebase.auth().currentUser;
     if (!user) return;
-    userVotes = [];
+    userVotes = {};
     var userVotesRef = firebase.database().ref("users/" + user.uid + "/" + selectedApp);
     userVotesRef.on("child_added", function(data) { userVotes[data.key] = data.val(); });
     userVotesRef.on("child_changed", function(data) { userVotes[data.key] = data.val(); });
