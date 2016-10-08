@@ -208,4 +208,6 @@ function setApp(appLink, appPackage) {
     selectedApp = appPackage;
     getUserVotes();
     getSuggestions();
+
+    ga('send', 'event', 'App', 'click', appPackage);
 }
