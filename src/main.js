@@ -56,6 +56,7 @@ function checkRedirect() {
 
 function signedInWith(user) {
     curUser = user;
+    console.log(user);
 
     document.getElementById("btn-signin").style.display = "none";
     document.getElementById("btn-signout").style.display = "block";
